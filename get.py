@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
+import scipy as sp
 import twitter
 import json
 from math import sqrt
@@ -56,7 +56,9 @@ def intersect(a, b):
 
 def similarity(u1, u2):
     commonFriends = intersect(u1['friends'], u2['friends'])
-    return len(commonFriends) / sqrt(len(u1['friends']) * len(u2['friends']))
+
+    sim = len(commonFriends) / sqrt(len(u1['friends']) * len(u2['friends']))
+    return sim
 
 def computeSimilarityMatrix():
     matrix = []
@@ -79,6 +81,22 @@ eig_vals, eig_vecs = np.linalg.eig(similarityMatrix)
 
 # print 
 
+def rowForScreenName(screen_name):
+    for i in range(len(users)):
+        if users[i]['screen_name'] == screen_name:
+            return i
+    return Null
+def screenNameForRow(row):
+    return users[row]['screen_name']
+
+def mostSimilarAccounts(screen_name):
+    ix = rowForScreenName(screen_name)
+    pairs = [(i, similarityMatrix[ix][i]) for i in range(len(users))]
+    pairs.sort(key=lambda pair: -pair[1])
+    return [screenNameForRow(pair[0]) for pair in pairs]
+
+
+print mostSimilarAccounts('annieloof')
 print eig_vecs[0,:]
 plt.scatter(eig_vecs[:,0],eig_vecs[:,1])
 for i in range(len(eig_vals)):
